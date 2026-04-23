@@ -54,10 +54,19 @@ const Login: React.FC<LoginProps> = ({ onLogin }) => {
           navigate('/customer-dashboard');
         }
       } else {
-        setError(data.message || 'Login failed');
+        // Handle explicit error messages from backend (including rate limits)
+        setError(data.message || data.error || 'Login failed. Please check your credentials.');
       }
-    } catch (err) {
-      setError('Network error. Please try again.');
+    } catch (err: any) {
+      console.error('Login Error Details:', err);
+      
+      if (err instanceof SyntaxError) {
+        setError('Server returned an unexpected response. Please try again later.');
+      } else if (err.name === 'TypeError' && err.message.includes('fetch')) {
+        setError('Cannot connect to server. Please ensure the backend is running.');
+      } else {
+        setError('An unexpected network error occurred. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

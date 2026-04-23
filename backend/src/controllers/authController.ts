@@ -79,6 +79,7 @@ export const login = async (req: Request, res: Response): Promise<void> => {
     }
 
     // Find user
+    console.log(`Login attempt for email: ${email}`);
     const user = await User.findOne({ email });
     if (!user) {
       res.status(401).json({ message: 'Invalid email or password' });
